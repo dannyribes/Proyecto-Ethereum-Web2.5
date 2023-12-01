@@ -1,0 +1,73 @@
+# Loop through nodes (node1, node2, node3)
+# Specify the path to addresses.txt
+addresses_file="addr.txt"
+# Clean up the content of addresses.txt (truncate the file)
+> "$addresses_file"
+for node in {2..3}; do
+    # Specify the folder containing the JSON file for the current node
+    folder="node$node/keystore"
+    # Specify the folder for the current node
+    node_folder="node$node"
+    # Remove the entire folder associated with the current node
+    echo "Removing node folder for node$node: $node_folder"
+    rm -rf "$node_folder"/*
+   # Generate Ethereum account for the current node
+    password_file="pwd.txt"
+    account_address=$(geth --datadir "node$node" account new --password "$password_file" | awk '/Address:/{print $2}')
+    # Get the name of the JSON file starting with "UTC" and without an extension in the specified folder
+    json_file=$(find "$folder" -type f -name 'UTC*' -exec basename {} \;)
+
+    # Check if a matching JSON file is found
+    if [ -n "$json_file" ]; then
+        # Read the JSON file and extract the address using jq
+        address=$(jq -r '.address' "$folder/$json_file")
+
+        # Print the extracted address
+        echo "Ethereum Address for node$node: $address"
+
+        # Append the address to addresses.txt
+        echo "$address" >> addr.txt
+    else
+        echo "No matching JSON file found in $folder starting with 'UTC' and without an extension."
+    fi
+done
+
+# Specify the Docker Compose file
+docker_compose_file="docker-compose.yml"
+
+# Clean up the content of docker-compose.yml (truncate the file)
+> "$docker_compose_file"
+
+# Add the Docker Compose configuration
+cat >> "$docker_compose_file" <<EOF
+version: '3'
+
+services:
+EOF
+
+# Loop through nodes and add Docker Compose configuration
+for node in {2..3}; do
+  node_folder="node$node"
+  password_file="pwd.txt"
+  address=$(sed -n "${node}p" "$addresses_file")
+
+  # Add Docker Compose configuration for each node
+  cat >> "$docker_compose_file" <<EOF
+  node$node:
+    image: ethereum/client-go
+    command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "$address", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
+    ports:
+      - "854$node:8545"
+    volumes:
+      - ./$node_folder:/gethdata
+EOF
+
+  # Create a directory for each node and copy the password file
+  mkdir -p "$node_folder"
+  cp "$password_file" "$node_folder/"
+done
+
+echo "Docker Compose file generated successfully."
+
+# Start the Ethereum nodes using Docker Compose
+docker-compose up -d
