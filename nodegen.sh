@@ -1,4 +1,3 @@
-# Loop through nodes (node1, node2, node3)
 # Specify the path to addresses.txt
 addresses_file="addr.txt"
 # Clean up the content of addresses.txt (truncate the file)
