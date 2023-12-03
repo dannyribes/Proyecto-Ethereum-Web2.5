@@ -44,7 +44,7 @@ timestamp_hex=$(printf "0x%x" $timestamp)
 
 
 # Step 2: Create the genesis.json file
-cat > genesis.json <<EOF
+cat > genesis_poa.json <<EOF
 {
   "config": {
     "chainId": 8888,
@@ -111,7 +111,7 @@ docker rm ethe-node-8888
 
 
 # Step 3: Initialize the node with the genesis.json file
-docker run --rm -it -v ${PWD}/node1:/node1 -v ${PWD}/genesis.json:/genesis.json ethereum/client-go:v1.11.5 init --datadir node1 /genesis.json
+docker run --rm -it -v ${PWD}/node1:/node1 -v ${PWD}/genesis_poa.json:/genesis_poa.json ethereum/client-go:v1.11.5 init --datadir node1 /genesis_poa.json
 
 # Docker run command
 docker run -d -p 8545:8545 -v /ethereum_ipc:/ipc -v ${PWD}/node1:/node1 --name ethe-node-8888 ethereum/client-go:v1.11.5 \

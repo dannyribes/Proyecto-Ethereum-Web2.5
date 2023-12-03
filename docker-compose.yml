@@ -1,13 +1,33 @@
 version: '3'
 
 services:
+  node2-init:
+    image: ethereum/client-go:v1.11.5
+    command: ["init", "--datadir", "/node2", "/genesis.json"]
+    volumes:
+      - /mnt/c/Users/danri/OneDrive/Escritorio/Proyecto-Ethereum-Web2.5/node2:/node2
+      - /mnt/c/Users/danri/OneDrive/Escritorio/Proyecto-Ethereum-Web2.5/genesis.json:/genesis.json
+    working_dir: /
+    stdin_open: true
+    tty: true
+
   node2:
     image: ethereum/client-go
-    command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "5494f944f7eab1f33cbb95890eb86262cf6188f9", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
+    command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "fad09108c5d733e2f390d98c6339a6dcf17ceacf", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
     ports:
       - "8542:8545"
     volumes:
       - ./node2:/gethdata
+  node3-init:
+    image: ethereum/client-go:v1.11.5
+    command: ["init", "--datadir", "/node3", "/genesis.json"]
+    volumes:
+      - /mnt/c/Users/danri/OneDrive/Escritorio/Proyecto-Ethereum-Web2.5/node3:/node3
+      - /mnt/c/Users/danri/OneDrive/Escritorio/Proyecto-Ethereum-Web2.5/genesis.json:/genesis.json
+    working_dir: /
+    stdin_open: true
+    tty: true
+
   node3:
     image: ethereum/client-go
     command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]

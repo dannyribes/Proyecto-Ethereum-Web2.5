@@ -1,5 +1,8 @@
 # Specify the path to addresses.txt
 addresses_file="addr.txt"
+# Set the variables
+NETWORK_ID="8888"  # Replace with your desired network ID
+GENESIS_FILE="genesis.json"  # Replace with the actual path to your genesis.json file
 # Clean up the content of addresses.txt (truncate the file)
 > "$addresses_file"
 for node in {2..3}; do
@@ -50,9 +53,18 @@ for node in {2..3}; do
   node_folder="node$node"
   password_file="pwd.txt"
   address=$(sed -n "${node}p" "$addresses_file")
-
   # Add Docker Compose configuration for each node
   cat >> "$docker_compose_file" <<EOF
+  node${node}-init:
+    image: ethereum/client-go:v1.11.5
+    command: ["init", "--datadir", "/node${node}", "/genesis.json"]
+    volumes:
+      - ${PWD}/node${node}:/node${node}
+      - ${PWD}/genesis.json:/genesis.json
+    working_dir: /
+    stdin_open: true
+    tty: true
+
   node$node:
     image: ethereum/client-go
     command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "$address", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
