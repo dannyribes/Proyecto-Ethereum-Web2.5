@@ -66,8 +66,8 @@ for node in {2..3}; do
     tty: true
 
   node$node:
-    image: ethereum/client-go
-    command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "$address", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
+    image: ethereum/client-go:v1.11.5
+    command: ["--datadir", "/gethdata", "--authrpc.addr", "0.0.0.0", "--authrpc.port", "8545", "--authrpc.vhosts", "eth,net,web3,personal,miner,clique", "--unlock", "$address", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
     ports:
       - "854$node:8545"
     volumes:
