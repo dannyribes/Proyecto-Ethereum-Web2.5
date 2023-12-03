@@ -13,6 +13,7 @@ for node in {2..3}; do
    # Generate Ethereum account for the current node
     password_file="pwd.txt"
     account_address=$(geth --datadir "node$node" account new --password "$password_file" | awk '/Address:/{print $2}')
+    echo "Account address newly created: $account_address"
     # Get the name of the JSON file starting with "UTC" and without an extension in the specified folder
     json_file=$(find "$folder" -type f -name 'UTC*' -exec basename {} \;)
 

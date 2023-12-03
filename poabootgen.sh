@@ -1,19 +1,18 @@
 set -x
-#!/bin/bash
-
 # Specify the path to addresses.txt
 addresses_file="addr.txt"
 # Clean up the content of addresses.txt (truncate the file)
 > "$addresses_file"
 # Specify the folder containing the JSON file for the current node
-folder="node1/keystore"
-# Specify the folder for the current node
 node_folder="node1"
+folder="node1/keystore"
 # Remove the entire folder associated with the current node
-echo "Removing node folder for node1: $node_folder"
-rm -rf "$node_folder"/*
+echo "Removing node folder for node1"
+rm -rf node1
 # Generate Ethereum account for the current node
 password_file="pwd.txt"
+mkdir -p "$node_folder"
+cp "$password_file" "$node_folder/"
 geth --datadir "node1" account new --password "$password_file"
 # Get the name of the JSON file starting with "UTC" and without an extension in the specified folder
 json_file=$(find "$folder" -type f -name 'UTC*' -exec basename {} \;)
@@ -35,8 +34,12 @@ fi
 echo "Account Address for node1: $address"
 
 # Constructed extraData
-extraData="0x0000000000000000000000000000000000000000000000000000000000000000$address"
+#         "0x000000000000000000000000000000000000000000000000000000000000000020d8e165c30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+extraData="0x0000000000000000000000000000000000000000000000000000000000000000"$address"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 echo "Constructed extraData: $extraData"
+
+timestamp=$(date +%s)
+timestamp_hex=$(printf "0x%x" $timestamp)
 
 
 
@@ -60,13 +63,22 @@ cat > genesis.json <<EOF
     }
   },
   "nonce": "0x0",
-  "timestamp": "0x6567c799",
-  "extraData": "0x00000000000000000000000000000000000000000000000000000000000000005c78815158d7acbc59401c12202f2c20d8e165c30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "timestamp": "$timestamp_hex",
+  "extraData": "$extraData",
   "gasLimit": "0x47b760",
   "difficulty": "0x1",
   "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
   "coinbase": "0x0000000000000000000000000000000000000000",
   "alloc": {
+    "00000000000000000000000000000000000000fd": {
+      "balance": "0x1"
+    },
+    "00000000000000000000000000000000000000fe": {
+      "balance": "0x1"
+    },
+    "00000000000000000000000000000000000000ff": {
+      "balance": "0x1"
+    },
     "37d5126b4c0e6789343b8e074840f5c6da43f47e": {
       "balance": "0x200000000000000000000000000000000000000000000000000000000000000"
     }
@@ -78,23 +90,42 @@ cat > genesis.json <<EOF
 }
 EOF
 
+# Generate a key using the --genkey option
+bootnode --genkey=boot.key
 
-docker rm bootnode ethe-node-8888
+# Start the bootnode with the generated key and set verbosity to 3 in the background
+bootnode --nodekey=boot.key --verbosity=3 > bootnode_output.log 2>&1 &
+
+# Wait for the background process to complete
+wait $!
+
+# Extract the enode information from the log file
+enode=$(grep -oP 'enode://[^\s]+' bootnode_output.log)
+
+# Print the enode information
+echo "Enode: $enode"
+
+
+docker stop ethe-node-8888
+docker rm ethe-node-8888
+
 
 # Step 3: Initialize the node with the genesis.json file
 docker run --rm -it -v ${PWD}/node1:/node1 -v ${PWD}/genesis.json:/genesis.json ethereum/client-go:v1.11.5 init --datadir node1 /genesis.json
 
-# Step 4: Generate a bootnode key
-docker run -v $(pwd):/keys ethereum/client-go:v1.11.5 bootnode --genkey=/keys/boot.key
+# Docker run command
+docker run -d -p 8545:8545 -v /ethereum_ipc:/ipc -v ${PWD}/node1:/node1 --name ethe-node-8888 ethereum/client-go:v1.11.5 \
+    --datadir node1 \
+    --http --http.api personal,eth,miner,net,web3,rpc \
+    --http.addr 0.0.0.0 --http.port 8545 \
+    --mine --allow-insecure-unlock \
+    --miner.etherbase "$address" \
+    --unlock "$address" \
+    --http.corsdomain="*" \
+    --miner.threads 1 \
+    --ipcpath /ipc/geth8888.ipc \
+    --password /node1/pwd.txt \
+    --bootnodes "$enode"
 
-# Step 5: Run the bootnode
-docker run -d -v $(pwd):/keys -p 30301:30301/udp --name bootnode ethereum/client-go:v1.11.5 bootnode --nodekey=/keys/boot.key --verbosity=3
 
-# Step 6: Obtain the enode
-bootnode_enode=$(docker exec -i $(docker ps -q --filter "name=bootnode") geth --exec "admin.nodeInfo.enode" attach /keys/boot.ipc)
 
-# Step 7: Deploy the node
-docker run -d -p 8545:8545 -v /ethereum_ipc:/ipc -v ${PWD}/node1:/node1 --name ethe-node-8888 ethereum/client-go:v1.11.5 --datadir node1 --http --http.api personal,eth,miner,net,web3,rpc --http.addr 0.0.0.0 --http.port 8545 --mine --allow-insecure-unlock --miner.etherbase $account_address --unlock "$account_address" --http.corsdomain="*" --miner.threads 1 --ipcpath /ipc/geth8888.ipc --password /node1/pwd.txt --bootnodes "$bootnode_enode"
-
-# Print instructions for connecting MetaMask
-echo "Connect MetaMask to the PoA node using the RPC endpoint http://localhost:8545."

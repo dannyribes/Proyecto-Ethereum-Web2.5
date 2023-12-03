@@ -3,7 +3,7 @@ version: '3'
 services:
   node2:
     image: ethereum/client-go
-    command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "322111479a4204b7bf4d52127c86ba8a0de0e80e", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
+    command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "5494f944f7eab1f33cbb95890eb86262cf6188f9", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
     ports:
       - "8542:8545"
     volumes:
