@@ -114,7 +114,7 @@ docker rm ethe-node-8888
 docker run --rm -it -v ${PWD}/node1:/node1 -v ${PWD}/genesis_poa.json:/genesis_poa.json ethereum/client-go:v1.11.5 init --datadir node1 /genesis_poa.json
 
 # Docker run command
-docker run -d -p 8545:8545 -v /ethereum_ipc:/ipc -v ${PWD}/node1:/node1 --name ethe-node-8888 ethereum/client-go:v1.11.5 \
+docker run -d -p 8545:8545  -v ${PWD}/node1:/node1 --name ethe-node-8888 ethereum/client-go:v1.11.5 \
     --datadir node1 \
     --http --http.api personal,eth,miner,net,web3,rpc \
     --http.addr 0.0.0.0 --http.port 8545 \

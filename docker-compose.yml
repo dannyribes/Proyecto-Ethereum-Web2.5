@@ -5,15 +5,15 @@ services:
     image: ethereum/client-go:v1.11.5
     command: ["init", "--datadir", "/node2", "/genesis.json"]
     volumes:
-      - /mnt/c/Users/danri/OneDrive/Escritorio/Proyecto-Ethereum-Web2.5/node2:/node2
-      - /mnt/c/Users/danri/OneDrive/Escritorio/Proyecto-Ethereum-Web2.5/genesis.json:/genesis.json
+      - /Users/guillermoaszyn/codecrypto/Proyecto-Ethereum-Web2.5/node2:/node2
+      - /Users/guillermoaszyn/codecrypto/Proyecto-Ethereum-Web2.5/genesis.json:/genesis.json
     working_dir: /
     stdin_open: true
     tty: true
 
   node2:
-    image: ethereum/client-go
-    command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "fad09108c5d733e2f390d98c6339a6dcf17ceacf", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
+    image: ethereum/client-go:v1.11.5
+    command: ["--datadir", "/gethdata", "--authrpc.addr", "0.0.0.0", "--authrpc.port", "8545", "--authrpc.vhosts", "eth,net,web3,personal,miner,clique", "--unlock", "0babd399fda05e3e4474771d92c9b3bd7bca762e", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
     ports:
       - "8542:8545"
     volumes:
@@ -22,15 +22,15 @@ services:
     image: ethereum/client-go:v1.11.5
     command: ["init", "--datadir", "/node3", "/genesis.json"]
     volumes:
-      - /mnt/c/Users/danri/OneDrive/Escritorio/Proyecto-Ethereum-Web2.5/node3:/node3
-      - /mnt/c/Users/danri/OneDrive/Escritorio/Proyecto-Ethereum-Web2.5/genesis.json:/genesis.json
+      - /Users/guillermoaszyn/codecrypto/Proyecto-Ethereum-Web2.5/node3:/node3
+      - /Users/guillermoaszyn/codecrypto/Proyecto-Ethereum-Web2.5/genesis.json:/genesis.json
     working_dir: /
     stdin_open: true
     tty: true
 
   node3:
-    image: ethereum/client-go
-    command: ["--datadir", "/gethdata", "--rpc", "--rpcaddr", "0.0.0.0", "--rpcport", "8545", "--rpcapi", "eth,net,web3,personal,miner,clique", "--unlock", "", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
+    image: ethereum/client-go:v1.11.5
+    command: ["--datadir", "/gethdata", "--authrpc.addr", "0.0.0.0", "--authrpc.port", "8545", "--authrpc.vhosts", "eth,net,web3,personal,miner,clique", "--unlock", "", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
     ports:
       - "8543:8545"
     volumes:
