@@ -57,6 +57,7 @@ cat > genesis_poa.json <<EOF
     "constantinopleBlock": 0,
     "petersburgBlock": 0,
     "istanbulBlock": 0,
+    "ethash": {},
     "clique": {
       "period": 15,
       "epoch": 30000
@@ -83,10 +84,12 @@ cat > genesis_poa.json <<EOF
       "balance": "0x200000000000000000000000000000000000000000000000000000000000000"
     }
   },
+  "eip1559": {
+    "maxFeePerGas": "0x1",
+    "maxPriorityFeePerGas": "0x1"
+  },
   "number": "0x0",
-  "gasUsed": "0x0",
-  "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-  "baseFeePerGas": null
+  "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
 }
 EOF
 

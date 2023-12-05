@@ -64,7 +64,7 @@ const NetworkCreator = () => {
           control={
             <Switch
               value={httpAccess}
-              onChange={(_, checked) => console.log(checked)}
+              onChange={(_, checked) => setHttpAccess(checked)}
             />
           }
           label="Http Access"

@@ -2,7 +2,7 @@
 addresses_file="addr.txt"
 # Set the variables
 NETWORK_ID="8888"  # Replace with your desired network ID
-GENESIS_FILE="genesis.json"  # Replace with the actual path to your genesis.json file
+GENESIS_FILE="genesis_poa.json"  # Replace with the actual path to your genesis.json file
 # Clean up the content of addresses.txt (truncate the file)
 > "$addresses_file"
 for node in {2..3}; do
@@ -57,7 +57,7 @@ for node in {2..3}; do
   cat >> "$docker_compose_file" <<EOF
   node${node}-init:
     image: ethereum/client-go:v1.11.5
-    command: ["init", "--datadir", "/node${node}", "/genesis.json"]
+    command: ["init", "--datadir", "/node${node}", "/genesis_poa.json"]
     volumes:
       - ${PWD}/node${node}:/node${node}
       - ${PWD}/genesis.json:/genesis.json

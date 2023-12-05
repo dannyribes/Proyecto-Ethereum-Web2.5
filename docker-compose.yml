@@ -3,7 +3,7 @@ version: '3'
 services:
   node2-init:
     image: ethereum/client-go:v1.11.5
-    command: ["init", "--datadir", "/node2", "/genesis.json"]
+    command: ["init", "--datadir", "/node2", "/genesis_poa.json"]
     volumes:
       - /Users/guillermoaszyn/codecrypto/Proyecto-Ethereum-Web2.5/node2:/node2
       - /Users/guillermoaszyn/codecrypto/Proyecto-Ethereum-Web2.5/genesis.json:/genesis.json
@@ -13,14 +13,14 @@ services:
 
   node2:
     image: ethereum/client-go:v1.11.5
-    command: ["--datadir", "/gethdata", "--authrpc.addr", "0.0.0.0", "--authrpc.port", "8545", "--authrpc.vhosts", "eth,net,web3,personal,miner,clique", "--unlock", "0babd399fda05e3e4474771d92c9b3bd7bca762e", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
+    command: ["--datadir", "/gethdata", "--authrpc.addr", "0.0.0.0", "--authrpc.port", "8545", "--authrpc.vhosts", "eth,net,web3,personal,miner,clique", "--unlock", "59afc429ca6838ed51c97d2eb11ee2fd6960fa41", "--password", "/gethdata/password.txt", "--mine", "--allow-insecure-unlock"]
     ports:
       - "8542:8545"
     volumes:
       - ./node2:/gethdata
   node3-init:
     image: ethereum/client-go:v1.11.5
-    command: ["init", "--datadir", "/node3", "/genesis.json"]
+    command: ["init", "--datadir", "/node3", "/genesis_poa.json"]
     volumes:
       - /Users/guillermoaszyn/codecrypto/Proyecto-Ethereum-Web2.5/node3:/node3
       - /Users/guillermoaszyn/codecrypto/Proyecto-Ethereum-Web2.5/genesis.json:/genesis.json
